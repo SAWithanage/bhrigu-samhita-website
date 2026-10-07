@@ -13,6 +13,6 @@ A lightweight, purely client-side web application for retrieving traditional Ved
 
 ```text
 .
-├── Bhrigu Samhita.html     # Frontend user interface and query logic
+├── index.html     # Frontend user interface and query logic
 ├── bhrigu_database.js      # Structured array of planetary combinations and predictions
 └── README.md               # Project documentation
