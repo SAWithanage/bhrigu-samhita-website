@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bhrigu Samhita Predictions</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        /* Container for side-by-side layout and centering */
+        #controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap; /* Allows stacking on very small screens */
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        select {
+            padding: 8px 12px;
+            min-width: 150px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #4a6fa5;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 18px; /* Aligns button with bottom of inputs */
+        }
+
+        button:hover {
+            background-color: #3b5998;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #eee;
+            margin: 30px auto;
+            max-width: 900px;
+        }
+
+        /* Display Area Styling */
+        #prediction-display {
+            max-width: 800px;
+            margin: 0 auto;
+            min-height: 100px;
+        }
+
+        #prediction-heading {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        #prediction-interpretation {
+            font-size: 1.1em;
+            line-height: 1.6;
+            white-space: pre-wrap; /* Preserves formatting from DB */
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Bhrigu Samhita</h1>
+
+    <!-- Selection Controls -->
+    <div id="controls">
+        <div class="control-group">
+            <label for="ascendant">Ascendant:</label>
+            <select id="ascendant">
+                <option value="">-- Select --</option>
+                <option value="Aries">Aries</option>
+                <option value="Taurus">Taurus</option>
+                <option value="Gemini">Gemini</option>
+                <option value="Cancer">Cancer</option>
+                <option value="Leo">Leo</option>
+                <option value="Virgo">Virgo</option>
+                <option value="Libra">Libra</option>
+                <option value="Scorpio">Scorpio</option>
+                <option value="Sagittarius">Sagittarius</option>
+                <option value="Capricorn">Capricorn</option>
+                <option value="Aquarius">Aquarius</option>
+                <option value="Pisces">Pisces</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="planet">Planet:</label>
+            <select id="planet">
+                <option value="">-- Select --</option>
+                <option value="Sun">Sun</option>
+                <option value="Moon">Moon</option>
+                <option value="Mars">Mars</option>
+                <option value="Mercury">Mercury</option>
+                <option value="Jupiter">Jupiter</option>
+                <option value="Venus">Venus</option>
+                <option value="Saturn">Saturn</option>
+                <option value="Rahu">Rahu</option>
+                <option value="Ketu">Ketu</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <label for="house">House:</label>
+            <select id="house">
+                <option value="">-- Select --</option>
+                <option value="1">1st House</option>
+                <option value="2">2nd House</option>
+                <option value="3">3rd House</option>
+                <option value="4">4th House</option>
+                <option value="5">5th House</option>
+                <option value="6">6th House</option>
+                <option value="7">7th House</option>
+                <option value="8">8th House</option>
+                <option value="9">9th House</option>
+                <option value="10">10th House</option>
+                <option value="11">11th House</option>
+                <option value="12">12th House</option>
+            </select>
+        </div>
+
+        <button id="getPredictionBtn">Get Prediction</button>
+    </div>
+
+    <hr>
+
+    <!-- Display Area -->
+    <div id="prediction-display">
+        <div id="prediction-heading"></div>
+        <div id="prediction-interpretation"></div>
+    </div>
+
+    <!-- Load the generated database file -->
+    <script src="bhrigu_database.js"></script>
+
+    <!-- Frontend Logic -->
+    <script>
+        document.getElementById('getPredictionBtn').addEventListener('click', function() {
+            const ascendant = document.getElementById('ascendant').value;
+            const planet = document.getElementById('planet').value;
+            const house = document.getElementById('house').value;
+            
+            const headingEl = document.getElementById('prediction-heading');
+            const interpretationEl = document.getElementById('prediction-interpretation');
+
+            // Clear previous results
+            headingEl.innerText = '';
+            interpretationEl.innerText = '';
+
+            if (!ascendant || !planet || !house) {
+                headingEl.innerText = 'Please select all three options.';
+                return;
+            }
+
+            // Ensure database is loaded
+            if (typeof bhriguDatabase === 'undefined') {
+                headingEl.innerText = 'Error: Database not loaded.';
+                return;
+            }
+
+            // Search the global bhriguDatabase variable
+            const result = bhriguDatabase.find(entry => 
+                entry.planet === planet && 
+                entry.house === parseInt(house) && 
+                entry.ascendant === ascendant
+            );
+
+            if (result) {
+                headingEl.innerText = result.heading;
+                interpretationEl.innerText = result.interpretation;
+            } else {
+                headingEl.innerText = 'No prediction found for this combination.';
+            }
+        });
+    </script>
+
+</body>
+</html>
